@@ -23,8 +23,14 @@ spec:
       gatekeeper.sh/system: "yes"
       heritage: '{{ .Release.Service }}'
       release: '{{ .Release.Name }}'
+  {{- with .Values.controllerManager }}
   strategy:
-    type: {{ .Values.controllerManager.strategyType }}
+    type: {{ .strategyType }}
+    {{- if ( eq ( toString ( default "RollingUpdate" .strategyType ) ) "RollingUpdate" ) }}
+    rollingUpdate:
+      {{- toYaml .rollingUpdate | nindent 6 }}
+    {{- end }}
+  {{- end }}
   template:
     metadata:
       annotations:
